@@ -1,0 +1,6 @@
+显示某目录下全部文件
+'dir 文件路径 /A:-D /S /B'
+递归拷贝文件目录及文件，可指定文件名后缀
+xcopy /i /y /e sourcePath\*.fileType outPath
+递归文件夹批量改名
+for /R %%i in (*.xlsx) do ren "%%i" *.json

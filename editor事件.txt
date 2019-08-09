@@ -1,0 +1,54 @@
+Editor.Ipc.sendToPanel('scene', 'scene:create-node-by-classid', 'New Node', '', 'parentUuid');
+添加一个组件：
+
+Editor.Ipc.sendToPanel('scene', 'scene:add-component', nodeID, 'cc.Animation');
+删除一个组件：
+
+Editor.Ipc.sendToPanel('scene', 'scene:remove-component', nodeID, compID);
+复制节点
+
+Editor.Ipc.sendToPanel('scene', 'scene:copy-nodes', uuids);
+粘贴节点:
+
+Editor.Ipc.sendToPanel('scene', 'scene:paste-nodes', parentID);
+
+
+只有场景激活的状态下，才能更新场景数据，所以必须等待scene:stash-and-save成功返回后，才能继续操作。
+
+  var uuids = [];
+  results.forEach(function(result) {
+    uuids.push(result.uuid);
+  });
+
+  var callFunc = function() {
+    if (uuids.length <= 0) return;
+
+    var uuid = uuids.shift();
+    _Scene.loadSceneByUuid(uuid, function(error) {
+      let canvas = cc.find("Canvas");
+
+      let node = new cc.Node();
+      node.name = "newNode";
+      node.parent = canvas;
+      Editor.Ipc.sendToPanel("scene", "scene:stash-and-save", function() {
+        setTimeout(callFunc, 1);
+        console.log("-------");
+      });
+    });
+  };
+
+  callFunc();
+});
+
+可以通过发送下面的消息，打开 prefab 编辑模式。
+
+Editor.Ipc.sendToAll('scene:enter-prefab-edit-mode', '7e977c15-ba64-4b07-8187-1bbf59fbc9fe');
+对应资源的 uuid 可以通过 assetDB 获取
+
+Editor.assetdb.queryUuidByUrl('db://assets/dead.prefab', (error, uuid) => {) });
+
+let asUuid = Editor.Selection.curSelection('asset') //资源管理器中当前选择的文件的uuid
+let nodeUuid = Editor.Selection.curSelection('node') //层级管理器中当前选择的节点的uuid
+
+
+Editor.remote.currentSceneUuid 这个方法可以获取当前编辑的场景
